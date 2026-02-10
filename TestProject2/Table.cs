@@ -8,22 +8,14 @@ namespace TestProject2
     [TestFixture]
     public class WorkingWithWebTable
     {
-        ChromeDriver? driver;
+        IWebDriver driver;
         ChromeOptions options;
 
         [SetUp]
         public void SetUp()
         {
             options = new ChromeOptions();
-            options.AddArgument("headless");
-            options.AddArgument("no-sandbox");
-            options.AddArgument("disable-dev-shm-usage");
-            options.AddArgument("disable-gpu");
-            options.AddArgument("window-size=1920x1080");
-            options.AddArgument("disable-extensions");
-            options.AddArgument("remote-debugging-port=9222");
-
-
+            options.AddArgument("--headless=new");
             driver = new ChromeDriver(options);
 
             // Add implicit wait
@@ -34,9 +26,6 @@ namespace TestProject2
         public void TestExtractProductInformation()
         {
             // Launch Chrome browser with the given URL
-            if (driver == null)
-                throw new InvalidOperationException("Driver was not initialized in SetUp");
-
             driver.Url = "http://practice.bpbonline.com/";
 
             // Identify the web table
@@ -49,11 +38,11 @@ namespace TestProject2
             string path = System.IO.Directory.GetCurrentDirectory() + "/productinformation.csv";
 
             // If the file exists in the location, delete it
-                        if (File.Exists(path))
+            if (File.Exists(path))
                 File.Delete(path);
 
             // Traverse through table rows to find the table columns
-               foreach (IWebElement trow in tableRows)
+            foreach (IWebElement trow in tableRows)
             {
                 ReadOnlyCollection<IWebElement> tableCols = trow.FindElements(By.XPath("td"));
                 foreach (IWebElement tcol in tableCols)
@@ -69,20 +58,16 @@ namespace TestProject2
             }
 
             // Verify the file was created and has content
-            Assert.That(File.Exists(path), "CSV file was not created");
-            Assert.That(new FileInfo(path).Length > 0, "CSV file is empty");
+            Assert.That(File.Exists(path), Is.True, "CSV file was not created");
+            Assert.That(new FileInfo(path).Length, Is.GreaterThan(0), "CSV file is empty");
         }
 
         [TearDown]
         public void TearDown()
         {
-            // Quit and dispose the driver
-            if (driver != null)
-            {
-                driver.Quit();
-                driver.Dispose();
-                driver = null;
-            }
+            // Quit the driver
+            driver.Quit();
+            driver.Dispose();
         }
     }
 }
