@@ -8,7 +8,7 @@ namespace TestProject2
     [TestFixture]
     public class WorkingWithWebTable
     {
-        ChromeDriver driver;
+        ChromeDriver? driver;
         ChromeOptions options;
 
         [SetUp]
@@ -34,6 +34,9 @@ namespace TestProject2
         public void TestExtractProductInformation()
         {
             // Launch Chrome browser with the given URL
+            if (driver == null)
+                throw new InvalidOperationException("Driver was not initialized in SetUp");
+
             driver.Url = "http://practice.bpbonline.com/";
 
             // Identify the web table
